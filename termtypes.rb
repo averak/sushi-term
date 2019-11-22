@@ -1,11 +1,24 @@
 require './console.rb'
+require './utility.rb'
 
 
 class TermTypes
+  include Utility
+
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
-    @con.draw('test', 'test')
+    draw('test01', 'test02')
+  end
+
+  def draw(*msg)
+    ## -----*----- 画面出力 -----*----- ##
+    @con.draw(*msg)
+  end
+
+  def timer(framerate)
+    ## -----*----- タイマー設定-----*----- ##
+    Timer::set_frame_rate(20)
   end
 end
 
