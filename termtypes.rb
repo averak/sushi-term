@@ -23,4 +23,6 @@ class TermTypes
 end
 
 
-TermTypes.new
+if __FILE__ == $0
+  TermTypes.new
+end
