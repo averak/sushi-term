@@ -43,6 +43,7 @@ class TermTypes
 
           if key == collect.slice(0)
             input += key
+            input = input.kana
             collect.slice!(0)
             cnt += 1
 
