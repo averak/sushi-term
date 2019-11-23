@@ -3,6 +3,7 @@ require './utility.rb'
 require 'csv'
 require 'romaji'
 require 'romaji/core_ext/string'
+require 'io/console'
 
 
 class TermTypes
@@ -22,18 +23,23 @@ class TermTypes
     ## -----*----- 処理実行 -----*----- ##
     Timer::set_frame_rate(60*100)
     loop do
-      @time = 3.0
+      @time = 5.0
       quest = @quest.sample
+      input = ''
 
       # タイマー（残り時間）
       Timer::timer {
         @time -= 0.01
-        draw(@time.to_s, quest[:text], quest[:romaji], quest[:kana])
+        draw(@time, quest[:text], quest[:romaji], input)
       }
 
-      #quest = @quest.sample
-      #draw(@time.to_s, quest[:text], quest[:romaji], quest[:kana])
-      sleep 3
+      Timer::timer(sleep: false) {
+        key = STDIN.getch
+        exit if key == "\C-c"
+        input += key
+      }
+
+      sleep 5.0
       Timer::exit
     end
   end

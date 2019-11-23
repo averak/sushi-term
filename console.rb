@@ -47,7 +47,7 @@ class Console
         # 空白でパディング
         insert = col[i] + ' ' * (@width - (@position[i][:x] + 6) - count_length(col[i]))
       else
-        col[i] = col[i][0...@size[i]]
+        col[i] = col[i].to_s[0...@size[i]]
         insert = col[i]
       end
       printf("\e[#{@position[i][:x] + 3}C\e[#{@position[i][:y]}B%-#{@size[i]}s\e[#{@text.count("\n")}A\e[#{@width}D", insert)
