@@ -85,9 +85,9 @@ class TermTypes
     return '' if (width * time / 5.0).to_i <= 0.0
 
     bar = '■' * (width * time / 5.0).to_i
-    if time > 3.0
+    if time > 3.3
       return "\e[32m#{bar}\e[0m"
-    elsif time > 1.5
+    elsif time > 1.7
       return "\e[33m#{bar}\e[0m"
     else
       return "\e[31m#{bar}\e[0m"
