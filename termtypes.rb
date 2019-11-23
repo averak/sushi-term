@@ -13,14 +13,29 @@ class TermTypes
     @con = Console.new('./config/console.txt')
     @quest = read_csv
 
+    exec
 
-    ## ===== test ===============
+  end
+
+
+  def exec
+    ## -----*----- 処理実行 -----*----- ##
+    Timer::set_frame_rate(60*100)
     loop do
+      @time = 3.0
       quest = @quest.sample
-      draw('2.38', quest[:text], quest[:romaji], quest[:kana])
-      sleep 0.5
+
+      # タイマー（残り時間）
+      Timer::timer {
+        @time -= 0.01
+        draw(@time.to_s, quest[:text], quest[:romaji], quest[:kana])
+      }
+
+      #quest = @quest.sample
+      #draw(@time.to_s, quest[:text], quest[:romaji], quest[:kana])
+      sleep 3
+      Timer::exit
     end
-    ## ==========================
   end
 
 
