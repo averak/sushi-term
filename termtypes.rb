@@ -9,14 +9,17 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
+    @quest = read_csv
 
 
     ## ===== test ===============
-    read_csv.each do |col|
-      draw(col[:text], col[:key], '')
-      sleep 1
+    loop do
+      quest = @quest.sample
+      draw(quest[:text], quest[:key], '')
+      sleep 0.5
     end
     ## ==========================
+
   end
 
   def draw(*msg)
