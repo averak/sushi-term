@@ -43,6 +43,7 @@ class Console
     raise ArgumentError unless col.length == @size.length
 
     @size.length.times do |i|
+      col[i] = col[i].to_s
       if @size[i] == 0
         # 空白でパディング
         insert = col[i] + ' ' * (@width - (@position[i][:x] + 6) - count_length(col[i]))

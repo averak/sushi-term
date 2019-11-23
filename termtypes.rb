@@ -28,7 +28,7 @@ class TermTypes
       # タイマー（残り時間）
       Timer::timer {
         @time -= 0.01
-        draw(@time, quest[:text], quest[:romaji], input)
+        draw(timebar(@time), quest[:text], quest[:romaji], input)
       }
 
       th = Thread.new {
@@ -79,9 +79,19 @@ class TermTypes
   end
 
 
-  def timer(framerate)
-    ## -----*----- タイマー設定-----*----- ##
-    Timer::set_frame_rate(20)
+  def timebar(time)
+    ## -----*----- 残り時間のバー表示 -----*----- ##
+    width = `tput cols`.to_i - 50
+    return '' if (width * time / 5.0).to_i <= 0.0
+
+    bar = '■' * (width * time / 5.0).to_i
+    if time > 3.0
+      return "\e[32m#{bar}\e[0m"
+    elsif time > 1.0
+      return "\e[33m#{bar}\e[0m"
+    else
+      return "\e[31m#{bar}\e[0m"
+    end
   end
 
 
