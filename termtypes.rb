@@ -15,7 +15,7 @@ class TermTypes
     ## ===== test ===============
     loop do
       quest = @quest.sample
-      draw(quest[:text], quest[:key], '')
+      draw(quest[:text], quest[:kana], '')
       sleep 0.5
     end
     ## ==========================
@@ -37,7 +37,7 @@ class TermTypes
     data = CSV.read('./config/text.csv')
     data.shift
 
-    return data.map { |col| {text: col[0], key: col[1]}}
+    return data.map { |col| {text: col[0], kana: col[1]}}
   end
 end
 
