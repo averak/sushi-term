@@ -12,7 +12,6 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
-    @quest = read_csv
 
     exec
   end
@@ -23,7 +22,7 @@ class TermTypes
     Timer::set_frame_rate(60*100)
     loop do
       @time = 5.0
-      quest = @quest.sample
+      quest = read_csv().sample
       input = ''
 
       # タイマー（残り時間）
@@ -34,13 +33,28 @@ class TermTypes
 
       th = Thread.new {
         collect = quest[:romaji].dup
+        tmp = collect.dup
+        cnt = 0
+
+        # キー入力
         loop do
           key = STDIN.getch
-          exit if key == "\C-c"
+          exit if key == "\C-c" || key == "\e"
 
           if key == collect.slice(0)
             input += key
             collect.slice!(0)
+            cnt += 1
+
+            str = tmp.chars.map.with_index do |c, i|
+              if i <= cnt - 1
+                "\e[30m#{c}\e[0m"
+              else
+                c
+              end
+            end
+
+            quest[:romaji] = str.join
 
             @time = 0.0 if collect == ''
           end

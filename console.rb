@@ -87,6 +87,7 @@ class Console
   def count_length(str)
     ## -----*----- 文字列の長さ取得 -----*----- ##
     # 半角：1，全角：2 としてカウント
+    str = str.gsub(/\e\[\d+m/, '')
     str.length + str.chars.reject(&:ascii_only?).length
   end
 end
