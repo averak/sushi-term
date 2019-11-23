@@ -33,17 +33,10 @@ class TermTypes
       }
 
       th = Thread.new {
-        collect = quest[:romaji].dup
         loop do
           key = STDIN.getch
           exit if key == "\C-c"
-
-          if key == collect.slice(0)
-            input += key
-            collect.slice!(0)
-
-            @time = 0.0 if collect == ''
-          end
+          input += key
         end
       }
 
@@ -75,9 +68,7 @@ class TermTypes
     data = CSV.read('./config/text.csv')
     data.shift
 
-    return data.map { |col| {text: col[0].strip,
-                             kana: col[1].strip, romaji: col[1].romaji.strip}
-    }
+    return data.map { |col| {text: col[0], kana: col[1], romaji: col[1].romaji}}
   end
 end
 
