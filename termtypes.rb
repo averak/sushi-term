@@ -1,6 +1,8 @@
 require './console.rb'
 require './utility.rb'
 require 'csv'
+require 'romaji'
+require 'romaji/core_ext/string'
 
 
 class TermTypes
@@ -15,7 +17,7 @@ class TermTypes
     ## ===== test ===============
     loop do
       quest = @quest.sample
-      draw(quest[:text], quest[:kana], '')
+      draw(quest[:text], quest[:romaji], quest[:kana])
       sleep 0.5
     end
     ## ==========================
@@ -37,7 +39,7 @@ class TermTypes
     data = CSV.read('./config/text.csv')
     data.shift
 
-    return data.map { |col| {text: col[0], kana: col[1]}}
+    return data.map { |col| {text: col[0], kana: col[1], romaji: col[1].romaji}}
   end
 end
 
