@@ -104,6 +104,19 @@ class TermTypes
                              kana: col[1].strip, romaji: col[1].romaji.strip}
     }
   end
+
+
+  def to_romajij
+    ## -----*----- ローマ字対応表 -----*----- ##
+    data = CSV.read('./config/romaji.csv')
+    data.shift
+    romaji = {}
+    data.each { |col|
+      romaji[col.shift.strip] = col.map {|s| s.strip}
+    }
+
+    return romaji
+  end
 end
 
 
