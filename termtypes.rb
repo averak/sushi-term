@@ -12,6 +12,7 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
+    @romaji = read_romajij
 
     exec
   end
@@ -28,11 +29,12 @@ class TermTypes
       # タイマー（残り時間）
       Timer::timer {
         @time -= 0.01
-        draw(timebar(@time), quest[:text], quest[:romaji], input)
+        romaji = quest[:romaji].map {|c| c[0]}.join
+        draw(timebar(@time), quest[:text], romaji, input)
       }
 
       th = Thread.new {
-        collect = quest[:romaji].dup
+        collect = quest[:romaji].map {|c| c[0]}.join
         tmp = collect.dup
         cnt = 0
 
@@ -101,12 +103,12 @@ class TermTypes
     data.shift
 
     return data.map { |col| {text: col[0].strip,
-                             kana: col[1].strip, romaji: col[1].romaji.strip}
+                             kana: col[1].strip, romaji: to_romaji(col[1])}
     }
   end
 
 
-  def to_romajij
+  def read_romajij
     ## -----*----- ローマ字対応表 -----*----- ##
     data = CSV.read('./config/romaji.csv')
     data.shift
@@ -116,6 +118,32 @@ class TermTypes
     }
 
     return romaji
+  end
+
+
+  def to_romaji(str)
+    ## -----*----- ローマ字に変換 -----*----- ##
+    str = str.strip
+    key = []
+    chars = str.chars
+    bias = 0
+    str.chars.each.with_index do |c, i|
+      if @romaji.keys.include?(c)
+        key << @romaji[c]
+      else
+        tmp = @romaji[(chars[i-1-bias] + c).chars.uniq.join]
+
+        if tmp.nil?
+          key << [@romaji[chars[i+1-bias]][0].chars[0]]
+        else
+          key[-1] = tmp
+          chars[i-1-bias] += c; chars.delete_at(i-bias)
+          bias += 1
+        end
+      end
+    end
+
+    return key
   end
 end
 

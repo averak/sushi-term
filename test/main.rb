@@ -25,41 +25,54 @@ class TermTypes
       @time = 5.0
       quest = read_csv().sample
       input = ''
+      output = quest[:romaji].map {|c| c[0]}.join
 
       # タイマー（残り時間）
       Timer::timer {
         @time -= 0.01
-        romaji = quest[:romaji].map {|c| c[0]}.join
-        draw(timebar(@time), quest[:text], romaji, input)
+        draw(timebar(@time), quest[:text], output, input)
       }
 
       th = Thread.new {
-        collect = quest[:romaji].map {|c| c[0]}.join
-        tmp = collect.dup
+        collect = quest[:romaji].dup
+        tmp = output.dup
         cnt = 0
 
         # キー入力
-        loop do
+        while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
-          if key == collect.slice(0)
-            input += key
-            input = input.kana
-            collect.slice!(0)
-            cnt += 1
+          begin
+            flag = false
+            collect[0].each.with_index do |c, i|
+              if key == c.slice(0)
+                unless flag
+                  input += key
+                  input = input.kana
+                  flag = true
+                end
+                collect[0][i].slice!(0)
+                cnt += 1
 
-            str = tmp.chars.map.with_index do |c, i|
-              if i <= cnt - 1
-                "\e[30m#{c}\e[0m"
-              else
-                c
+                str = tmp.chars.map.with_index do |c, i|
+                  if i <= cnt - 1
+                    "\e[30m#{c}\e[0m"
+                  else
+                    c
+                  end
+                end
+                output = str.join
+
+              end
+              if c == ''
+                collect.shift
               end
             end
 
-            quest[:romaji] = str.join
-
-            @time = 0.0 if collect == ''
+          rescue
+            @time = 0.0
+            break
           end
         end
       }

@@ -1,7 +1,7 @@
 require 'csv'
 
 
-str = 'ぽけっとてぃっしゅ'
+str = 'きょうがくのじじつ'
 
 data = CSV.read('./config/romaji.csv')
 data.shift
