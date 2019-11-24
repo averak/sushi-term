@@ -1,12 +1,23 @@
 require 'csv'
 
 
-str = 'インクジェットプリンター'
+str = 'ほしのないよるのそら'
 
-romaji = CSV.read('./config/romaji.csv')
-romaji.shift
-romaji.map! { |col|
-  {col.shift.strip => col.map {|s| s.strip}}
+data = CSV.read('./config/romaji.csv')
+data.shift
+romaji = {}
+data.each { |col|
+  romaji[col.shift.strip] = col.map {|s| s.strip}
 }
+
+
+key = []
+str.chars.each do |c|
+  if romaji.keys.include?(c)
+    key << romaji[c]
+  else
+    key << [c]
+  end
+end
 p str
-p romaji
+p key
