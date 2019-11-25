@@ -6,10 +6,11 @@ A tool that allows you to practice typing on the terminal like [寿司打](http:
 
 ## Requirement
 - Ruby 2.6.5
+- romaji gem
 
 
 ## Usage
-- Play Game
+# Play Game
 ```sh
 $ ruby termtypes
 ```
