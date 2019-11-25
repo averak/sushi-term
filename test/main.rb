@@ -42,7 +42,7 @@ class TermTypes
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
-          if collect[0].nil?
+          unless collect[0].respond_to?(:each)
             @time = 0.0
             break
           end
