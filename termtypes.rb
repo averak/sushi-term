@@ -12,7 +12,6 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
-    @romaji = read_romajij
 
     exec
   end
@@ -25,42 +24,57 @@ class TermTypes
       @time = 5.0
       quest = read_csv().sample
       input = ''
+      output = quest[:romaji].map {|c| c[0]}.join
 
       # タイマー（残り時間）
       Timer::timer {
         @time -= 0.01
-        romaji = quest[:romaji].map {|c| c[0]}.join
-        draw(timebar(@time), quest[:text], romaji, input)
+        draw(timebar(@time), quest[:text], output, input.kana)
       }
 
       th = Thread.new {
-        collect = quest[:romaji].map {|c| c[0]}.join
-        tmp = collect.dup
+        collect = quest[:romaji]
+        tmp = output.dup
         cnt = 0
 
         # キー入力
-        loop do
+        while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
-          if key == collect.slice(0)
-            input += key
-            input = input.kana
-            collect.slice!(0)
-            cnt += 1
-
-            str = tmp.chars.map.with_index do |c, i|
-              if i <= cnt - 1
-                "\e[30m#{c}\e[0m"
-              else
-                c
-              end
-            end
-
-            quest[:romaji] = str.join
-
-            @time = 0.0 if collect == ''
+          if collect[0].nil?
+            @time = 0.0
+            break
           end
+          flag = true
+          collect[0].each.with_index do |c, i|
+            if key == c.slice(0)
+              if flag
+                input += key
+                #input = input.kana
+                collect[0][i].slice!(0)
+                cnt += 1
+                flag = false
+              end
+
+              str = tmp.chars.map.with_index do |c, i|
+                if i <= cnt - 1
+                  "\e[30m#{c}\e[0m"
+                else
+                  c
+                end
+              end
+              output = str.join
+            end
+            if c == ''
+              collect.shift
+            end
+            if collect == []
+              @time = 0.0
+              break
+            end
+          end
+
         end
       }
 
@@ -123,18 +137,19 @@ class TermTypes
 
   def to_romaji(str)
     ## -----*----- ローマ字に変換 -----*----- ##
+    romaji = read_romajij
     str = str.strip
     key = []
     chars = str.chars
     bias = 0
     str.chars.each.with_index do |c, i|
-      if @romaji.keys.include?(c)
-        key << @romaji[c]
+      if romaji.keys.include?(c)
+        key << romaji[c]
       else
-        tmp = @romaji[(chars[i-1-bias] + c).chars.uniq.join]
+        tmp = romaji[(chars[i-1-bias] + c).chars.uniq.join]
 
         if tmp.nil?
-          key << [@romaji[chars[i+1-bias]][0].chars[0]]
+          key << [romaji[chars[i+1-bias]][0].chars[0]]
         else
           key[-1] = tmp
           chars[i-1-bias] += c; chars.delete_at(i-bias)
