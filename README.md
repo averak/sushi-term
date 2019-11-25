@@ -10,7 +10,7 @@ A tool that allows you to practice typing on the terminal like [寿司打](http:
 
 
 ## Usage
-# Play Game
+### Play Game
 ```sh
 $ ruby termtypes
 ```
