@@ -48,7 +48,6 @@ class TermTypes
               if key == c.slice(0)
                 if flag
                   input += key
-                  #input = input.kana
                   collect[0][i].slice!(0)
                   cnt += 1
                   flag = false
