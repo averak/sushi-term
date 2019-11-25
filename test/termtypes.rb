@@ -98,7 +98,7 @@ class TermTypes
 
   def timebar(time)
     ## -----*----- 残り時間のバー表示 -----*----- ##
-    width = `tput cols`.to_i - 50
+    width = `tput cols`.to_i - 18
     return '' if (width * time / 5.0).to_i <= 0.0
 
     bar = '■' * (width * time / 5.0).to_i

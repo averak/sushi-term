@@ -42,37 +42,38 @@ class TermTypes
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
-          unless collect[0].respond_to?(:each)
+          flag = true
+          begin
+            collect[0].each.with_index do |c, i|
+              if key == c.slice(0)
+                if flag
+                  input += key
+                  #input = input.kana
+                  collect[0][i].slice!(0)
+                  cnt += 1
+                  flag = false
+                end
+
+                str = tmp.chars.map.with_index do |c, i|
+                  if i <= cnt - 1
+                    "\e[30m#{c}\e[0m"
+                  else
+                    c
+                  end
+                end
+                output = str.join
+              end
+              if c == ''
+                collect.shift
+              end
+              if collect == []
+                @time = 0.0
+                break
+              end
+            end
+          rescue
             @time = 0.0
             break
-          end
-          flag = true
-          collect[0].each.with_index do |c, i|
-            if key == c.slice(0)
-              if flag
-                input += key
-                #input = input.kana
-                collect[0][i].slice!(0)
-                cnt += 1
-                flag = false
-              end
-
-              str = tmp.chars.map.with_index do |c, i|
-                if i <= cnt - 1
-                  "\e[30m#{c}\e[0m"
-                else
-                  c
-                end
-              end
-              output = str.join
-            end
-            if c == ''
-              collect.shift
-            end
-            if collect == []
-              @time = 0.0
-              break
-            end
           end
 
         end
@@ -97,7 +98,7 @@ class TermTypes
 
   def timebar(time)
     ## -----*----- 残り時間のバー表示 -----*----- ##
-    width = `tput cols`.to_i - 50
+    width = `tput cols`.to_i - 18
     return '' if (width * time / 5.0).to_i <= 0.0
 
     bar = '■' * (width * time / 5.0).to_i

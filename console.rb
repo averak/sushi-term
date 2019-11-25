@@ -46,7 +46,11 @@ class Console
       col[i] = col[i].to_s
       if @size[i] == 0
         # 空白でパディング
-        insert = col[i] + ' ' * (@width - (@position[i][:x] + 6) - count_length(col[i]))
+        if (@width - (@position[i][:x] + 6) - count_length(col[i])) < 0
+          insert = col[i] + ' '
+        else
+          insert = col[i] + ' ' * (@width - (@position[i][:x] + 6) - count_length(col[i]))
+        end
       else
         col[i] = col[i].to_s[0...@size[i]]
         insert = col[i]
