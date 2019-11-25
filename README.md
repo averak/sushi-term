@@ -8,6 +8,12 @@ A tool that allows you to practice typing on the terminal like [寿司打](http:
 - Ruby 2.6.5
 
 
+## Usage
+- Play Game
+```sh
+$ ruby termtypes
+```
+
 ## Installation
 ```sh
 $ git clone https://github.com/AtLab-jp/TermTypes
