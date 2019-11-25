@@ -42,37 +42,38 @@ class TermTypes
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
-          unless collect[0].respond_to?(:each)
+          flag = true
+          begin
+            collect[0].each.with_index do |c, i|
+              if key == c.slice(0)
+                if flag
+                  input += key
+                  #input = input.kana
+                  collect[0][i].slice!(0)
+                  cnt += 1
+                  flag = false
+                end
+
+                str = tmp.chars.map.with_index do |c, i|
+                  if i <= cnt - 1
+                    "\e[30m#{c}\e[0m"
+                  else
+                    c
+                  end
+                end
+                output = str.join
+              end
+              if c == ''
+                collect.shift
+              end
+              if collect == []
+                @time = 0.0
+                break
+              end
+            end
+          rescue
             @time = 0.0
             break
-          end
-          flag = true
-          collect[0].each.with_index do |c, i|
-            if key == c.slice(0)
-              if flag
-                input += key
-                #input = input.kana
-                collect[0][i].slice!(0)
-                cnt += 1
-                flag = false
-              end
-
-              str = tmp.chars.map.with_index do |c, i|
-                if i <= cnt - 1
-                  "\e[30m#{c}\e[0m"
-                else
-                  c
-                end
-              end
-              output = str.join
-            end
-            if c == ''
-              collect.shift
-            end
-            if collect == []
-              @time = 0.0
-              break
-            end
           end
 
         end
