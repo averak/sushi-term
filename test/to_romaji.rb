@@ -31,3 +31,4 @@ str.chars.each.with_index do |c, i|
 end
 p str
 p key.map {|c| c[0]}.join
+p key
