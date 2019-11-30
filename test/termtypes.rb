@@ -34,7 +34,6 @@ class TermTypes
 
       th = Thread.new {
         collect = Marshal.load(Marshal.dump(quest[:romaji]))
-        cnt = 0
 
         # キー入力
         while @time > 0.0
@@ -45,10 +44,11 @@ class TermTypes
           begin
             collect[0].each.with_index do |c, i|
               if key == c.slice(0)
+                if flag
                   input += key
                   collect[0][i].slice!(0)
-                  cnt += 1
                   flag = false
+                end
               end
 
               if c == ''
