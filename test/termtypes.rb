@@ -52,14 +52,10 @@ class TermTypes
                   flag = false
                 end
 
-                output = quest[:romaji].map.with_index { |c, i|
-                  if quest[:romaji].length - collect.length > i
-                    "\e[30m#{c[0]}\e[0m"
-                  else
-                    c[0]
-                  end
-                }.join
+                # 出力文字
+                output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
               end
+
               if c == ''
                 collect.shift
               end
@@ -84,6 +80,20 @@ class TermTypes
       Timer::exit
       th.kill
     end
+  end
+
+
+  def make_output(romaji, len)
+    ## -----*----- 出力文字の生成 -----*----- ##
+    ret = romaji.map.with_index { |c, i|
+      if i < len
+        "\e[30m#{c[0]}\e[0m"
+      else
+        c[0]
+      end
+    }
+
+    return ret.join
   end
 
 
