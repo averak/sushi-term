@@ -33,8 +33,7 @@ class TermTypes
       }
 
       th = Thread.new {
-        collect = quest[:romaji]
-        tmp = output.dup
+        collect = quest[:romaji].dup
         cnt = 0
 
         # キー入力
@@ -48,20 +47,18 @@ class TermTypes
               if key == c.slice(0)
                 if flag
                   input += key
-                  #input = input.kana
                   collect[0][i].slice!(0)
                   cnt += 1
                   flag = false
                 end
 
-                str = tmp.chars.map.with_index do |c, i|
-                  if i <= cnt - 1
-                    "\e[30m#{c}\e[0m"
+                output = quest[:romaji].map.with_index { |c, i|
+                  if quest[:romaji].length - collect.length > i
+                    "\e[30m#{c[0]}\e[0m"
                   else
-                    c
+                    c[0]
                   end
-                end
-                output = str.join
+                }.join
               end
               if c == ''
                 collect.shift
