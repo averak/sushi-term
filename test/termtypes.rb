@@ -24,7 +24,7 @@ class TermTypes
       @time = 5.0
       quest = read_csv().sample
       input = ''
-      output = quest[:romaji].map {|c| c[0]}.join
+      output = make_output(quest[:romaji])
 
       # タイマー（残り時間）
       Timer::timer {
@@ -33,7 +33,7 @@ class TermTypes
       }
 
       th = Thread.new {
-        collect = quest[:romaji].dup
+        collect = Marshal.load(Marshal.dump(quest[:romaji]))
         cnt = 0
 
         # キー入力
@@ -45,15 +45,10 @@ class TermTypes
           begin
             collect[0].each.with_index do |c, i|
               if key == c.slice(0)
-                if flag
                   input += key
                   collect[0][i].slice!(0)
                   cnt += 1
                   flag = false
-                end
-
-                # 出力文字
-                output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
               end
 
               if c == ''
@@ -63,8 +58,12 @@ class TermTypes
                 @time = 0.0
                 break
               end
+
+              # 出力文字
+              output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
             end
-          rescue
+          rescue => e
+            p e
             @time = 0.0
             break
           end
@@ -83,10 +82,10 @@ class TermTypes
   end
 
 
-  def make_output(romaji, len)
+  def make_output(romaji, words=0)
     ## -----*----- 出力文字の生成 -----*----- ##
     ret = romaji.map.with_index { |c, i|
-      if i < len
+      if i < words
         "\e[30m#{c[0]}\e[0m"
       else
         c[0]
