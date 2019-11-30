@@ -62,8 +62,7 @@ class TermTypes
               # 出力文字
               output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
             end
-          rescue => e
-            p e
+          rescue
             @time = 0.0
             break
           end
