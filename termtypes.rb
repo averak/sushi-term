@@ -12,6 +12,7 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
+    @limit = 10.0
 
     exec
   end
@@ -21,7 +22,7 @@ class TermTypes
     ## -----*----- 処理実行 -----*----- ##
     Timer::set_frame_rate(60*100)
     loop do
-      @time = 5.0
+      @time = @limit.dup
       quest = read_csv().sample
       input = ''
       output = make_output(quest[:romaji])
@@ -104,12 +105,12 @@ class TermTypes
   def timebar(time)
     ## -----*----- 残り時間のバー表示 -----*----- ##
     width = `tput cols`.to_i - 18
-    return '' if (width * time / 5.0).to_i <= 0.0
+    return '' if (width * time / @limit).to_i <= 0.0
 
-    bar = '■' * (width * time / 5.0).to_i
-    if time > 3.3
+    bar = '■' * (width * time / @limit).to_i
+    if time > @limit * 2/3
       return "\e[32m#{bar}\e[0m"
-    elsif time > 1.7
+    elsif time > @limit / 3
       return "\e[33m#{bar}\e[0m"
     else
       return "\e[31m#{bar}\e[0m"
