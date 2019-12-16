@@ -12,7 +12,7 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
-    @limit = 10.0
+    @limit = 15.0
 
     exec
   end
