@@ -12,7 +12,7 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
-    @limit = 15.0
+    @limit = 5.0
 
     exec
   end
@@ -108,6 +108,7 @@ class TermTypes
     return '' if (width * time / @limit).to_i <= 0.0
 
     bar = '■' * (width * time / @limit).to_i
+
     if time > @limit * 2/3
       return "\e[32m#{bar}\e[0m"
     elsif time > @limit / 3
