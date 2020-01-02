@@ -1,4 +1,4 @@
-TermTypes
+SushiTerm
 =========
 
 A tool that allows you to practice typing on the terminal like [寿司打](http://typingx0.net/sushida/).
