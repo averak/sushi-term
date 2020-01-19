@@ -44,7 +44,7 @@ class TermTypes
           flag = true
           begin
             collect[0].each.with_index do |c, i|
-              if key == c.slice(0)
+              if key == c.slice(0) || key == c.slice(0).upcase
                 if flag
                   input += key
                   collect[0][i].slice!(0)
