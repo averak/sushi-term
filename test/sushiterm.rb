@@ -1,120 +1,145 @@
+# -*- coding: utf-8 -*-
+
 require './lib/console.rb'
 require './lib/utility.rb'
+require './lib/romaji.rb'
 require 'csv'
-require 'romaji'
-require 'romaji/core_ext/string'
 require 'io/console'
 
 
-class TermTypes
+class SushiTerm
   include Utility
 
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
-    @con = Console.new('./config/outfmt.txt')
+    @cons = Console.new './config/outfmt.txt'
+    @romaji = Romaji.new './config/romaji.csv'
     @limit = 5.0
 
-    exec
+    # 問題文を読み取り
+    @sentences = CSV.read('./config/text.csv')
+    @sentences.shift
+    @sentences.map! { |col|
+      {
+        text: col[0].strip,
+        kana: col[1].strip,
+        romaji: @romaji.to_romaji(col[1])
+      }
+    }
   end
 
 
   def exec
     ## -----*----- 処理実行 -----*----- ##
-    Timer::set_frame_rate(60*100)
     loop do
-      @time = @limit.dup
-      quest = read_csv().sample
-      input = ''
-      output = make_output(quest[:romaji])
+      # 変数設定
+      @time = @limit.dup         # 残り時間
+      timer 60*100               # 残り時間のタイマー
+      @quest = @sentences.sample # 現在の問題文
+      @quest[:input] = ['']      # 入力されたローマ字の配列
+      collect = Marshal.load(Marshal.dump(@quest[:romaji]))
+      cnt = [0, 0]
 
-      # タイマー（残り時間）
-      Timer::timer {
-        @time -= 0.01
-        draw(timebar(@time), quest[:text], output, input.kana)
-      }
-
-      th = Thread.new {
-        collect = Marshal.load(Marshal.dump(quest[:romaji]))
-
+      key_input = Thread.new {
         # キー入力
-       while @time > 0.0
+        while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
-          char_index = 0
 
-          flag = true
-          begin
-            collect[0].each.with_index do |c, i|
-              unless c.slice(0).nil?
-                if key == c.slice(0) || key == c.slice(0).upcase
-                  if flag
-                    input += key
-                    collect[0][i].slice!(0) unless collect[0][i].nil?
-                    #quest[:romaji][char_index][0] = quest[:romaji][char_index][i]
-                    flag = false
-                  end
+          b_same = false
+          collect[0].length.times { |i|
+            # 正解キーが入力された場合
+            unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
+              if key==@quest[:romaji][cnt[0]][i][cnt[1]] || key==@quest[:romaji][cnt[0]][i][cnt[1]].upcase
+                unless b_same
+                  @quest[:input][-1] += key
+                  collect[0][i].slice!(0)
+                  b_same = true
+                  cnt[1] += 1
                 end
               end
-
-              if c == ''
-                collect.shift
-                char_index += 1
-              end
-              if collect == []
-                @time = 0.0
-                break
-              end
-
-              # 出力文字
-              #output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
-              output = make_output(quest[:romaji], input.length)
             end
-          rescue => e
-            p e
-            @time = 0.0
-            break
-          end
 
+            # カタカナ１文字分入力し終わった場合
+            if collect[0][i] == ''
+              collect.shift
+              cnt[0] += 1
+              cnt[1] = 0
+              @quest[:input] << ''
+              break  unless collect == []
+            end
+            # 入力終了した場合
+            if collect == []
+              @time = 0.0
+              break
+            end
+          }
         end
       }
 
+      # タイムリミット -> 次の問題へ
       loop do
         sleep 0.01
         break if @time <= 0.0
       end
-
+      # サブスレッドをkill
+      sleep 0.3
       Timer::exit
-      th.kill
+      key_input.kill
     end
   end
 
 
-  def make_output(romaji, words=0)
-    ## -----*----- 出力文字の生成 -----*----- ##
-    cnt = 0
-    ret = romaji.map { |s|
-      s[0].chars.map { |c|
-        cnt += 1
-        if cnt <= words
-          "\e[30m#{c}\e[0m"
-        else
-          c
-        end
-      }.join
+  private
+
+
+  def timer(frame_rate)
+    ## -----*----- タイマー -----*----- ##
+    Timer::set_frame_rate(frame_rate)
+    Timer::timer {
+      @time -= 0.01
+      # 描画
+      print_board(
+        build_timebar(@time),
+        @quest[:text],
+        build_outstr(@quest[:romaji], @quest[:input].join.length),
+        @romaji.to_katakana(@quest[:input])
+      )
     }
-
-    return ret.join
   end
 
 
-  def draw(*msg)
+  def print_board(*msg)
     ## -----*----- 画面出力 -----*----- ##
-    @con.draw(*msg)
+    @cons.draw(*msg)
   end
 
 
-  def timebar(time)
-    ## -----*----- 残り時間のバー表示 -----*----- ##
+  def build_outstr(romaji, n_chars=0)
+    ## -----*----- 出力文字を生成 -----*----- ##
+    # romaji  : 出力文字のローマ字配列
+    # n_chars : 入力された文字数
+    ret = romaji.map.with_index { |s, i|
+      if @quest[:input].length > i
+        s.find { |c| c.include?(@quest[:input][i])}
+      else
+        s[0]
+      end
+    }.join
+    ret = ret.chars.map.with_index { |c, i|
+      if i < n_chars
+        "\e[30m#{c}\e[0m"
+      else
+        c
+      end
+    }.join
+
+    ret
+  end
+
+
+  def build_timebar(time)
+    ## -----*----- 残り時間のバー生成 -----*----- ##
     width = `tput cols`.to_i - 18
     return '' if (width * time / @limit).to_i <= 0.0
 
@@ -128,61 +153,10 @@ class TermTypes
       return "\e[31m#{bar}\e[0m"
     end
   end
-
-
-  def read_csv
-    ## -----*----- CSV読み込み -----*----- ##
-    data = CSV.read('./config/text.csv')
-    data.shift
-
-    return data.map { |col| {text: col[0].strip,
-                             kana: col[1].strip, romaji: to_romaji(col[1])}
-    }
-  end
-
-
-  def read_romajij
-    ## -----*----- ローマ字対応表 -----*----- ##
-    data = CSV.read('./config/romaji.csv')
-    data.shift
-    romaji = {}
-    data.each { |col|
-      romaji[col.shift.strip] = col.map {|s| s.strip}
-    }
-
-    return romaji
-  end
-
-
-  def to_romaji(str)
-    ## -----*----- ローマ字に変換 -----*----- ##
-    romaji = read_romajij
-    str = str.strip
-    key = []
-    chars = str.chars
-    bias = 0
-    str.chars.each.with_index do |c, i|
-      if romaji.keys.include?(c)
-        key << romaji[c]
-      else
-        tmp = romaji[(chars[i-1-bias] + c).chars.uniq.join]
-
-        if tmp.nil?
-          key << [romaji[chars[i+1-bias]][0].chars[0]]
-        else
-          key[-1] = tmp
-          chars[i-1-bias] += c; chars.delete_at(i-bias)
-          bias += 1
-        end
-      end
-    end
-
-    return key
-  end
 end
 
 
 if __FILE__ == $0
-  TermTypes.new
+  obj = SushiTerm.new
+  obj.exec
 end
-
