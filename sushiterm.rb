@@ -32,10 +32,17 @@ class SushiTerm
   def exec
     ## -----*----- 処理実行 -----*----- ##
     loop do
+      # 変数設定
       @time = @limit.dup         # 残り時間
       timer 60*100               # 残り時間のタイマー
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ''
+
+      # キー入力
+      while @time > 0.0
+        key = STDIN.getch
+        exit if key == "\C-c" || key == "\e"
+      end
     end
   end
 
