@@ -63,7 +63,8 @@ class TermTypes
               end
 
               # 出力文字
-              output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
+              #output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
+              output = make_output(quest[:romaji], input.length)
             end
           rescue => e
             p e
@@ -87,12 +88,16 @@ class TermTypes
 
   def make_output(romaji, words=0)
     ## -----*----- 出力文字の生成 -----*----- ##
-    ret = romaji.map.with_index { |c, i|
-      if i < words
-        "\e[30m#{c[0]}\e[0m"
-      else
-        c[0]
-      end
+    cnt = 0
+    ret = romaji.map { |s|
+      s[0].chars.map { |c|
+        cnt += 1
+        if cnt <= words
+          "\e[30m#{c}\e[0m"
+        else
+          c
+        end
+      }.join
     }
 
     return ret.join
