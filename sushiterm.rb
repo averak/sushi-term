@@ -38,11 +38,22 @@ class SushiTerm
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ''
 
-      # キー入力
-      while @time > 0.0
-        key = STDIN.getch
-        exit if key == "\C-c" || key == "\e"
+      key_input = Thread.new {
+        # キー入力
+        while @time > 0.0
+          key = STDIN.getch
+          exit if key == "\C-c" || key == "\e"
+        end
+      }
+
+      # タイムリミット -> 次の問題へ
+      loop do
+        sleep 0.01
+        break if @time <= 0.0
       end
+      # サブスレッドをkill
+      Timer::exit
+      key_input.kill
     end
   end
 
