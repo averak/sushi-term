@@ -37,7 +37,7 @@ class TermTypes
         collect = Marshal.load(Marshal.dump(quest[:romaji]))
 
         # キー入力
-        while @time > 0.0
+       while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
           char_index = 0
@@ -185,3 +185,4 @@ end
 if __FILE__ == $0
   TermTypes.new
 end
+
