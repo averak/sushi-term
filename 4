@@ -46,6 +46,7 @@ class SushiTerm
           exit if key == "\C-c" || key == "\e"
 
           b_same = false
+          collect[0] = @quest[:romaji][@quest[:input].length-1]
           collect[0].length.times { |i|
             # 正解キーが入力された場合
             unless collect[0][i]&.slice(0).nil?
