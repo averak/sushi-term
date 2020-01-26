@@ -15,6 +15,17 @@ class SushiTerm
     @cons = Console.new './config/outfmt.txt'
     @romaji = Romaji.new './config/romaji.csv'
     @limit = 5.0
+
+    # 問題文を読み取り
+    @sentences = CSV.read('./config/text.csv')
+    @sentences.shift
+    @sentences.map! { |col|
+      {
+        text: col[0].strip,
+        kana: col[1].strip,
+        romaji: @romaji.to_romaji(col[1])
+      }
+    }
   end
 
 

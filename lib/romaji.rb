@@ -32,7 +32,7 @@ class Romaji
           key << [@romaji[chars[i+1-bias]][0].chars[0]]
         else
           key[-1] = tmp
-          chars[i-1-bias] += c chars.delete_at(i-bias)
+          chars[i-1-bias] += c; chars.delete_at(i-bias)
           bias += 1
         end
       end
