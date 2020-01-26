@@ -43,6 +43,7 @@ class SushiTerm
         while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
+          @quest[:input] += key
         end
       }
 
@@ -87,6 +88,11 @@ class SushiTerm
     ## -----*----- 出力文字を生成 -----*----- ##
     # romaji : 出力文字のローマ字配列
     # words  : 入力された文字数
+    ret = romaji.map { |s|
+      s[0]
+    }.join
+
+    ret
   end
 
 
