@@ -48,7 +48,11 @@ class Romaji
     katakana = romaji.map { |c|
       search = @romaji.find {|k,v| v.include? c }
       if search.nil?
-        c
+        if c.length == 1 && !'aiueo'.include?(c)
+          'っ'
+        else
+          c
+        end
       else
         search[0]
       end

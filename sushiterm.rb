@@ -38,6 +38,7 @@ class SushiTerm
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ['']      # 入力されたローマ字の配列
       collect = Marshal.load(Marshal.dump(@quest[:romaji]))
+      cnt = [0, 0]
 
       key_input = Thread.new {
         # キー入力
@@ -48,12 +49,13 @@ class SushiTerm
           b_same = false
           collect[0].length.times { |i|
             # 正解キーが入力された場合
-            unless collect[0][i]&.slice(0).nil?
-              if key==collect[0][i].slice(0) || key==collect[0][i].slice(0).upcase
+            unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
+              if key==@quest[:romaji][cnt[0]][i][cnt[1]] || key==@quest[:romaji][cnt[0]][i][cnt[1]].upcase
                 unless b_same
                   @quest[:input][-1] += key
                   collect[0][i].slice!(0)
                   b_same = true
+                  cnt[1] += 1
                 end
               end
             end
@@ -61,6 +63,8 @@ class SushiTerm
             # カタカナ１文字分入力し終わった場合
             if collect[0][i] == ''
               collect.shift
+              cnt[0] += 1
+              cnt[1] = 0
               @quest[:input] << ''
               break  unless collect == []
             end
