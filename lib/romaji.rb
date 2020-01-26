@@ -45,14 +45,16 @@ class Romaji
   def to_katakana(romaji)
     ## -----*----- ローマ字->カタカナ変換 -----*----- ##
     # ローマ字の連番配列を指定
-    katakana = romaji.map { |c|
+    katakana = romaji.map.with_index { |c, i|
       search = @romaji.find {|k,v| v.include? c }
       if search.nil?
-        if c.length == 1 && !'aiueo'.include?(c)
-          'っ'
-        else
-          c
+        tmp = c
+        if i+1 < romaji.length
+          if c == romaji[i+1][0]
+            tmp = 'っ'
+          end
         end
+        tmp
       else
         search[0]
       end
