@@ -44,11 +44,13 @@ class TermTypes
           flag = true
           begin
             collect[0].each.with_index do |c, i|
-              if key == c.slice(0) || key == c.slice(0).upcase
-                if flag
-                  input += key
-                  collect[0][i].slice!(0)
-                  flag = false
+              unless c.slice(0).nil?
+                if key == c.slice(0) || key == c.slice(0).upcase
+                  if flag
+                    input += key
+                    collect[0][i].slice!(0)
+                    flag = false
+                  end
                 end
               end
 
@@ -63,7 +65,8 @@ class TermTypes
               # 出力文字
               output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
             end
-          rescue
+          rescue => e
+            p e
             @time = 0.0
             break
           end
