@@ -36,7 +36,8 @@ class SushiTerm
       @time = @limit.dup         # 残り時間
       timer 60*100               # 残り時間のタイマー
       @quest = @sentences.sample # 現在の問題文
-      @quest[:input] = ['']
+      @quest[:input] = ['']      # 入力されたローマ字の配列
+      @quest[:i_romaji] = Array.new(@quest[:romaji].length, 0)
       collect = Marshal.load(Marshal.dump(@quest[:romaji]))
 
       key_input = Thread.new {
@@ -52,7 +53,8 @@ class SushiTerm
               if key==romaji.slice(0) || key==romaji.slice(0).upcase
                 unless b_same
                   @quest[:input][-1] += key
-                  collect[0][i].slice!(0)
+                  @quest[:i_romaji][@quest[:input].length-1] = i
+                  collect[0][i].slice!(0)  unless collect[0][i].nil?
                   b_same = true
                 end
               end
@@ -96,7 +98,7 @@ class SushiTerm
       print_board(
         build_timebar(@time),
         @quest[:text],
-        build_outstr(@quest[:romaji]),
+        build_outstr(@quest[:romaji], @quest[:input].join.length),
         @romaji.to_katakana(@quest[:input])
       )
     }
@@ -113,9 +115,16 @@ class SushiTerm
     ## -----*----- 出力文字を生成 -----*----- ##
     # romaji : 出力文字のローマ字配列
     # words  : 入力された文字数
-    ret = romaji.map { |s|
-      s[0]
+    ret = romaji.map.with_index { |s, i|
+      s[@quest[:i_romaji][i]]
     }.join
+    #     ret = romaji.map.with_index { |s, i|
+    #       if i < n_chars-1
+    #         "\e[30m#{s[@quest[:i_romaji][i]]}\e[0m"
+    #       else
+    #         s[@quest[:i_romaji][i]]
+    #       end
+    #     }.join
 
     ret
   end
