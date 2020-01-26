@@ -12,6 +12,7 @@ class TermTypes
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
     @con = Console.new('./config/console.txt')
+    @limit = 5.0
 
     exec
   end
@@ -21,7 +22,7 @@ class TermTypes
     ## -----*----- 処理実行 -----*----- ##
     Timer::set_frame_rate(60*100)
     loop do
-      @time = 5.0
+      @time = @limit.dup
       quest = read_csv().sample
       input = ''
       output = make_output(quest[:romaji])
@@ -39,20 +40,25 @@ class TermTypes
         while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
+          char_index = 0
 
           flag = true
           begin
             collect[0].each.with_index do |c, i|
-              if key == c.slice(0)
-                if flag
-                  input += key
-                  collect[0][i].slice!(0)
-                  flag = false
+              unless c.slice(0).nil?
+                if key == c.slice(0) || key == c.slice(0).upcase
+                  if flag
+                    input += key
+                    collect[0][i].slice!(0) unless collect[0][i].nil?
+                    #quest[:romaji][char_index][0] = quest[:romaji][char_index][i]
+                    flag = false
+                  end
                 end
               end
 
               if c == ''
                 collect.shift
+                char_index += 1
               end
               if collect == []
                 @time = 0.0
@@ -60,7 +66,8 @@ class TermTypes
               end
 
               # 出力文字
-              output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
+              #output = make_output(quest[:romaji], quest[:romaji].length - collect.length)
+              output = make_output(quest[:romaji], input.length)
             end
           rescue => e
             p e
@@ -84,12 +91,16 @@ class TermTypes
 
   def make_output(romaji, words=0)
     ## -----*----- 出力文字の生成 -----*----- ##
-    ret = romaji.map.with_index { |c, i|
-      if i < words
-        "\e[30m#{c[0]}\e[0m"
-      else
-        c[0]
-      end
+    cnt = 0
+    ret = romaji.map { |s|
+      s[0].chars.map { |c|
+        cnt += 1
+        if cnt <= words
+          "\e[30m#{c}\e[0m"
+        else
+          c
+        end
+      }.join
     }
 
     return ret.join
@@ -105,12 +116,13 @@ class TermTypes
   def timebar(time)
     ## -----*----- 残り時間のバー表示 -----*----- ##
     width = `tput cols`.to_i - 18
-    return '' if (width * time / 5.0).to_i <= 0.0
+    return '' if (width * time / @limit).to_i <= 0.0
 
-    bar = '■' * (width * time / 5.0).to_i
-    if time > 3.3
+    bar = '■' * (width * time / @limit).to_i
+
+    if time > @limit * 2/3
       return "\e[32m#{bar}\e[0m"
-    elsif time > 1.7
+    elsif time > @limit / 3
       return "\e[33m#{bar}\e[0m"
     else
       return "\e[31m#{bar}\e[0m"
