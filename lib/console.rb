@@ -1,4 +1,4 @@
-require './utility.rb'
+require './lib/utility.rb'
 
 class Console
   include Utility

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
-require './console.rb'
-require './utility.rb'
+require './lib/console.rb'
+require './lib/utility.rb'
 require 'csv'
 require 'io/console'
 

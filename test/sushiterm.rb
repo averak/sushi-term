@@ -1,5 +1,5 @@
-require './console.rb'
-require './utility.rb'
+require './lib/console.rb'
+require './lib/utility.rb'
 require 'csv'
 require 'romaji'
 require 'romaji/core_ext/string'
