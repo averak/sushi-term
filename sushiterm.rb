@@ -40,6 +40,7 @@ class TermTypes
         while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
+          char_index = 0
 
           flag = true
           begin
@@ -48,7 +49,8 @@ class TermTypes
                 if key == c.slice(0) || key == c.slice(0).upcase
                   if flag
                     input += key
-                    collect[0][i].slice!(0)
+                    collect[0][i].slice!(0) unless collect[0][i].nil?
+                    quest[:romaji][char_index][0] = quest[:romaji][char_index][i]
                     flag = false
                   end
                 end
@@ -56,6 +58,7 @@ class TermTypes
 
               if c == ''
                 collect.shift
+                char_index += 1
               end
               if collect == []
                 @time = 0.0
