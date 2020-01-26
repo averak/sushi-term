@@ -49,12 +49,12 @@ class SushiTerm
           b_same = false
           collect[0].each_with_index { |romaji, i|
             # 正しいキーが入力された場合
-            unless romaji.slice(0).nil?
-              if key==romaji.slice(0) || key==romaji.slice(0).upcase
+            unless collect[0][i].nil?
+              if key==collect[0][i].slice(0) || key==collect[0][i].slice(0).upcase
                 unless b_same
                   @quest[:input][-1] += key
                   @quest[:i_romaji][@quest[:input].length-1] = i
-                  collect[0][i].slice!(0)  unless collect[0][i].nil?
+                  collect[0][i].slice!(0)
                   b_same = true
                 end
               end
@@ -72,6 +72,8 @@ class SushiTerm
             end
           }
         end
+
+        @time = 0.0
       }
 
       # タイムリミット -> 次の問題へ
@@ -80,6 +82,7 @@ class SushiTerm
         break if @time <= 0.0
       end
       # サブスレッドをkill
+      sleep 0.3
       Timer::exit
       key_input.kill
     end
@@ -113,18 +116,22 @@ class SushiTerm
 
   def build_outstr(romaji, n_chars=0)
     ## -----*----- 出力文字を生成 -----*----- ##
-    # romaji : 出力文字のローマ字配列
-    # words  : 入力された文字数
+    # romaji  : 出力文字のローマ字配列
+    # n_chars : 入力された文字数
     ret = romaji.map.with_index { |s, i|
-      s[@quest[:i_romaji][i]]
+      if @quest[:input].length > i
+        s.find { |c| c.include?(@quest[:input][i])}
+      else
+        s[0]
+      end
     }.join
-    #     ret = romaji.map.with_index { |s, i|
-    #       if i < n_chars-1
-    #         "\e[30m#{s[@quest[:i_romaji][i]]}\e[0m"
-    #       else
-    #         s[@quest[:i_romaji][i]]
-    #       end
-    #     }.join
+    ret = ret.chars.map.with_index { |c, i|
+      if i < n_chars
+        "\e[30m#{c}\e[0m"
+      else
+        c
+      end
+    }.join
 
     ret
   end
