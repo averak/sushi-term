@@ -36,14 +36,39 @@ class SushiTerm
       @time = @limit.dup         # 残り時間
       timer 60*100               # 残り時間のタイマー
       @quest = @sentences.sample # 現在の問題文
-      @quest[:input] = ''
+      @quest[:input] = ['']
+      collect = Marshal.load(Marshal.dump(@quest[:romaji]))
 
       key_input = Thread.new {
         # キー入力
         while @time > 0.0
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
-          @quest[:input] += key
+
+          b_same = false
+          collect[0].each_with_index { |romaji, i|
+            # 正しいキーが入力された場合
+            unless romaji.slice(0).nil?
+              if key==romaji.slice(0) || key==romaji.slice(0).upcase
+                unless b_same
+                  @quest[:input][-1] += key
+                  collect[0][i].slice!(0)
+                  b_same = true
+                end
+              end
+            end
+
+            # カタカナ１文字分入力し終わった場合
+            if romaji == ''
+              collect.shift
+              @quest[:input] << ''
+            end
+            # 入力終了した場合
+            if collect == []
+              @time = 0.0
+              break
+            end
+          }
         end
       }
 
@@ -72,7 +97,7 @@ class SushiTerm
         build_timebar(@time),
         @quest[:text],
         build_outstr(@quest[:romaji]),
-        @quest[:input]
+        @romaji.to_katakana(@quest[:input])
       )
     }
   end
