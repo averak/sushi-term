@@ -11,7 +11,7 @@ class TermTypes
 
   def initialize
     ## -----*----- コンストラクタ -----*----- ##
-    @con = Console.new('./config/console.txt')
+    @con = Console.new('./config/outfmt.txt')
     @limit = 5.0
 
     exec

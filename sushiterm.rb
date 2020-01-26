@@ -7,5 +7,10 @@ require 'io/console'
 
 
 class SushiTerm
+  include utility
 
+  def initialize
+    ## -----*----- コンストラクタ -----*----- ##
+    @cons = Console.new './config/outfmt.txt'
+  end
 end
