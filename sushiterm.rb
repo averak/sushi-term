@@ -37,8 +37,8 @@ class SushiTerm
       timer 60*100               # 残り時間のタイマー
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ['']      # 入力されたローマ字の配列
-      @quest[:i_romaji] = Array.new(@quest[:romaji].length, 0)
       collect = Marshal.load(Marshal.dump(@quest[:romaji]))
+      @a = collect
 
       key_input = Thread.new {
         # キー入力
@@ -47,13 +47,12 @@ class SushiTerm
           exit if key == "\C-c" || key == "\e"
 
           b_same = false
-          collect[0].each_with_index { |romaji, i|
-            # 正しいキーが入力された場合
-            unless collect[0][i].nil?
+          collect[0].length.times { |i|
+            # 正解キーが入力された場合
+            unless collect[0][i]&.slice(0).nil?
               if key==collect[0][i].slice(0) || key==collect[0][i].slice(0).upcase
                 unless b_same
                   @quest[:input][-1] += key
-                  @quest[:i_romaji][@quest[:input].length-1] = i
                   collect[0][i].slice!(0)
                   b_same = true
                 end
@@ -61,9 +60,10 @@ class SushiTerm
             end
 
             # カタカナ１文字分入力し終わった場合
-            if romaji == ''
+            if collect[0][i] == ''
               collect.shift
               @quest[:input] << ''
+              break  unless collect == []
             end
             # 入力終了した場合
             if collect == []
