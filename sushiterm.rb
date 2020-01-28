@@ -52,7 +52,7 @@ class SushiTerm
             unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
               if key==@quest[:romaji][cnt[0]][i][cnt[1]] || key==@quest[:romaji][cnt[0]][i][cnt[1]].upcase
                 unless b_same
-                  @quest[:input][-1] += key
+                  @quest[:input][-1] += key.downcase
                   collect[0][i].slice!(0)
                   b_same = true
                   cnt[1] += 1
