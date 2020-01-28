@@ -34,6 +34,7 @@ class SushiTerm
     loop do
       # 変数設定
       @time = @limit.dup         # 残り時間
+      @next=false
       timer 60*100               # 残り時間のタイマー
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ['']      # 入力されたローマ字の配列
@@ -66,7 +67,7 @@ class SushiTerm
               @quest[:input] << ''
 
               # 入力終了した場合
-              @time = 0.0  if collect == []
+              @next = true  if collect == []
 
               break
             end
@@ -77,12 +78,13 @@ class SushiTerm
       # タイムリミット -> 次の問題へ
       loop do
         sleep 0.01
-        break if @time <= 0.0
+        break if @time <= 0.0 || @next
       end
       # サブスレッドをkill
       sleep 0.3
       Timer::exit
       key_input.kill
+      @next = false
     end
   end
 
@@ -94,7 +96,7 @@ class SushiTerm
     ## -----*----- タイマー -----*----- ##
     Timer::set_frame_rate(frame_rate)
     Timer::timer {
-      @time -= 0.01
+      @time -= 0.01  unless @next
       katakana = @romaji.to_katakana(@quest[:input])
       # 入力配列へのキー追加に失敗している際のケア
       if !katakana.match(/[a-z]/).nil? && @quest[:input][-1]==''
@@ -149,7 +151,9 @@ class SushiTerm
 
     bar = '■' * (width * time / @limit).to_i
 
-    if time > @limit * 2/3
+    if @next
+      return "\e[30m#{bar}\e[0m"
+    elsif time > @limit * 2/3
       return "\e[32m#{bar}\e[0m"
     elsif time > @limit / 3
       return "\e[33m#{bar}\e[0m"
