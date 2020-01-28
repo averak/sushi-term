@@ -52,14 +52,10 @@ class SushiTerm
             if key==@quest[:romaji][cnt[0]][i][cnt[1][i]] || key==@quest[:romaji][cnt[0]][i][cnt[1][i]].upcase
               unless b_same
                 @quest[:input][-1] += key.downcase
-                collect[0][i].slice!(0)
                 b_same = true
-                cnt[1][i] += 1
-                p @quest[:input]
-              else
-                collect[0][i].slice!(0)
-                cnt[1][i] += 1
               end
+              collect[0][i].slice!(0)
+              cnt[1][i] += 1
             end
 
             # カタカナ１文字分入力し終わった場合
