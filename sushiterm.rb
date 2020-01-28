@@ -97,15 +97,9 @@ class SushiTerm
       @time -= 0.01
       katakana = @romaji.to_katakana(@quest[:input])
       # 入力配列へのキー追加に失敗している際のケア
-      unless katakana.match(/[a-z]./).nil?
-        @quest[:input].map!.with_index { |key, i|
-          break if key=='' || @quest[:romaji][i].nil?
-          if @quest[:romaji][i].include?(key)
-            key
-          else
-            @quest[:romaji][i][0]
-          end
-        }
+      if !katakana.match(/[a-z]/).nil? && @quest[:input][-1]==''
+        index = @quest[:input].length-2
+        @quest[:input][index] = @quest[:romaji][index][0]
       end
 
       # 描画
@@ -115,7 +109,7 @@ class SushiTerm
         build_outstr(@quest[:romaji], @quest[:input].join.length),
         katakana
       )
-    }
+      }
   end
 
 
