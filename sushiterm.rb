@@ -95,12 +95,25 @@ class SushiTerm
     Timer::set_frame_rate(frame_rate)
     Timer::timer {
       @time -= 0.01
+      katakana = @romaji.to_katakana(@quest[:input])
+      # 入力配列へのキー追加に失敗している際のケア
+      unless katakana.match(/[a-z]./).nil?
+        @quest[:input].map!.with_index { |key, i|
+          break if key=='' || @quest[:romaji][i].nil?
+          if @quest[:romaji][i].include?(key)
+            key
+          else
+            @quest[:romaji][i][0]
+          end
+        }
+      end
+
       # 描画
       print_board(
         build_timebar(@time),
         @quest[:text],
         build_outstr(@quest[:romaji], @quest[:input].join.length),
-        @romaji.to_katakana(@quest[:input])
+        katakana
       )
     }
   end
