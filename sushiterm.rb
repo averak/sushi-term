@@ -129,7 +129,6 @@ class SushiTerm
     ## -----*----- 出力文字を生成 -----*----- ##
     # romaji  : 出力文字のローマ字配列
     # n_chars : 入力された文字数
-    n_chars += @romaji.to_katakana(@quest[:input]).scan(/[a-z]./).length
     ret = romaji.map.with_index { |s, i|
       if @quest[:input].length > i
         s.find { |c| c.include?(@quest[:input][i])}
