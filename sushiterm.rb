@@ -49,16 +49,18 @@ class SushiTerm
           b_same = false
           collect[0].length.times { |i|
             # 正解キーが入力された場合
-            unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
-              if key==@quest[:romaji][cnt[0]][i][cnt[1]] || key==@quest[:romaji][cnt[0]][i][cnt[1]].upcase
+            #unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
+              if key==@quest[:romaji][cnt[0]][i][cnt[1]]
                 unless b_same
+                  #p key
+                  #p @quest[:input]
                   @quest[:input][-1] += key.downcase
                   collect[0][i].slice!(0)
                   b_same = true
                   cnt[1] += 1
                 end
               end
-            end
+            #end
 
             # カタカナ１文字分入力し終わった場合
             if collect[0][i] == ''
@@ -66,11 +68,10 @@ class SushiTerm
               cnt[0] += 1
               cnt[1] = 0
               @quest[:input] << ''
-              break  unless collect == []
-            end
-            # 入力終了した場合
-            if collect == []
-              @time = 0.0
+
+              # 入力終了した場合
+              @time = 0.0  if collect == []
+
               break
             end
           }
