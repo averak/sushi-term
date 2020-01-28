@@ -38,35 +38,35 @@ class SushiTerm
       @quest = @sentences.sample # 現在の問題文
       @quest[:input] = ['']      # 入力されたローマ字の配列
       collect = Marshal.load(Marshal.dump(@quest[:romaji]))
-      cnt = [0, 0]
+      cnt = [0, Array.new(@quest[:romaji][0].length, 0)]
 
       key_input = Thread.new {
         # キー入力
-        while @time > 0.0
+        while @time > 0.0 && collect != []
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
           b_same = false
           collect[0].length.times { |i|
             # 正解キーが入力された場合
-            #unless @quest[:romaji][cnt[0]][i][cnt[1]].nil?
-              if key==@quest[:romaji][cnt[0]][i][cnt[1]]
-                unless b_same
-                  #p key
-                  #p @quest[:input]
-                  @quest[:input][-1] += key.downcase
-                  collect[0][i].slice!(0)
-                  b_same = true
-                  cnt[1] += 1
-                end
+            if key==@quest[:romaji][cnt[0]][i][cnt[1][i]] || key==@quest[:romaji][cnt[0]][i][cnt[1][i]].upcase
+              unless b_same
+                @quest[:input][-1] += key.downcase
+                collect[0][i].slice!(0)
+                b_same = true
+                cnt[1][i] += 1
+                p @quest[:input]
+              else
+                collect[0][i].slice!(0)
+                cnt[1][i] += 1
               end
-            #end
+            end
 
             # カタカナ１文字分入力し終わった場合
             if collect[0][i] == ''
               collect.shift
               cnt[0] += 1
-              cnt[1] = 0
+              cnt[1] = Array.new(collect[0].length, 0)  unless collect[0].nil?
               @quest[:input] << ''
 
               # 入力終了した場合
