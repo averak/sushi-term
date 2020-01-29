@@ -14,7 +14,7 @@ class SushiTerm
     ## -----*----- コンストラクタ -----*----- ##
     @cons = Console.new './config/outfmt.txt'
     @romaji = Romaji.new './config/romaji.csv'
-    @limit = 5.0
+    @limit = 10.0
 
     # 問題文を読み取り
     @sentences = CSV.read('./config/text.csv')
@@ -96,8 +96,12 @@ class SushiTerm
   def timer(frame_rate)
     ## -----*----- タイマー -----*----- ##
     Timer::set_frame_rate(frame_rate)
+    t1 = Time.now
+    t2 = Time.now
     Timer::timer {
-      @time -= 60.0 / frame_rate  unless @next
+      t2 = Time.now
+      @time -= t2-t1  unless @next
+      t1 = Time.now
       katakana = @romaji.to_katakana(@quest[:input])
       # 入力配列へのキー追加に失敗している際のケア
       if !katakana.match(/[a-z]/).nil? && @quest[:input][-1]==''
@@ -112,7 +116,7 @@ class SushiTerm
         build_outstr(@quest[:romaji], @quest[:input].join.length),
         katakana
       )
-      }
+    }
   end
 
 
