@@ -44,6 +44,7 @@ class SushiTerm
       key_input = Thread.new {
         # キー入力
         while @time > 0.0 && collect != []
+          next  if @next
           key = STDIN.getch
           exit if key == "\C-c" || key == "\e"
 
