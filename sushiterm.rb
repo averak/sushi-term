@@ -97,7 +97,7 @@ class SushiTerm
     ## -----*----- タイマー -----*----- ##
     Timer::set_frame_rate(frame_rate)
     Timer::timer {
-      @time -= 0.01  unless @next
+      @time -= 60.0 / frame_rate  unless @next
       katakana = @romaji.to_katakana(@quest[:input])
       # 入力配列へのキー追加に失敗している際のケア
       if !katakana.match(/[a-z]/).nil? && @quest[:input][-1]==''
